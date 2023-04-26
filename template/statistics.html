@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Статистика</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style_statistics.css') }}">
+</head>
+
+<body>
+    <div class="statics">
+        <a href="{{ url_for('index') }}" class="return-button">Вернуться</a>
+    </div>
+    <h1>Ваша статистика</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Дата</th>
+                <th>Количество калорий</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for date in dates %}
+            <tr>
+                <td>{{ date['date_time'] }}</td>
+                <td>
+                    <ol>
+                        {% for calorie in calories %}
+                        {% if calorie.date_id == date.id  %}
+                        <li>
+                            <div class="calorie-item">
+                                <span class="calorie-amount">{{ calorie.amount }}</span>
+                                <form method="POST">
+                                    <button class="delete-button">Удалить</button>
+                                    <input type="number" class="delete-input" name="delete" value={{ calorie.id }}>
+                                </form>
+                            </div>
+                        </li>
+                        {% endif %}
+                        {% endfor %}
+                    </ol>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr>
+                <th>Среднее количество калорий за день:</th>
+                <td colspan="2">{{ average_calories }}</td>
+            </tr>
+        </tfoot>
+    </table>
+</body>
+
+</html>

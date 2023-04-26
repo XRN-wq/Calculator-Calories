@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Счетчик калорий</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style_index.css') }}">
+</head>
+
+<body>
+    <div class="statics">
+        <a href="statistics">Ваша статистика</a>
+    </div>
+    <div class="label">
+        <label>Счетчик калорий</label>
+    </div>
+    <br>
+    <div class="container">
+        <div class="input-container">
+            <label for="my-select">Выберите категорию:</label>
+            <select id="my-select">
+                <option value="meat">Мясо</option>
+                <option value="fish">Рыба</option>
+                <option value="vegetables">Овощи</option>
+                <option value="fruits">Фрукты</option>
+                <option value="sweets">Сладости</option>
+            </select>
+        </div>
+
+        <div class="input-container">
+            <label for="food-type">Тип продукта:</label>
+            <div id="content"></div>
+        </div>
+        <div class="input-container">
+            <label for="amount">Количество (грамм):</label>
+            <input type="number" id="amount" />
+        </div>
+
+        <button class="button" onclick="calculateCalories()">Рассчитать калории</button>
+        <br>
+        <form method="POST" id="my-form">
+            <div class="result-container">
+                <input type="number" id="calories" placeholder="0" name="calories" />
+                <h5>калорий</h5>
+                <br>
+                <h5>(если знаете кол-во введите самостоятельно)</h5>
+            </div>
+            <br>
+            <div class="date-input">
+                <label for="date-input">Выберите дату:</label>
+                <input type="date" id="date-input" name="date">
+            </div>
+            <br>
+            <div class="submit-container">
+                <input type="submit" id="submit" value="Отправить">
+            </div>
+        </form>
+    </div>
+    <script>
+        // Получаем текущую дату
+        const today = new Date();
+
+        // Преобразуем дату в строку в формате yyyy-mm-dd, который поддерживается элементом <input type="date">
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
+        const dd = String(today.getDate()).padStart(2, '0');
+        const todayString = `${yyyy}-${mm}-${dd}`;
+        const dateInput = document.getElementById('date-input');
+        dateInput.value = todayString;
+        var select = document.getElementById("my-select");
+        var content = document.getElementById("content");
+        var items = {
+            meat: ["Курица", "Говядина", "Свинина", "Баранина"],
+            fish: ["Треска", "Лосось", "Скумбрия", "Макрель"],
+            vegetables: ["Морковь", "Капуста", "Огурцы", "Томаты"],
+            fruits: ["Яблоки", "Апельсины", "Бананы", "Ананасы"],
+            sweets: ["Шоколад", "Конфеты", "Печенье", "Мармелад"]
+        };
+
+        // Добавить обработчик события на изменение select
+        select.addEventListener("change", function() {
+            var html = "";
+            var category = this.value;
+
+            for (var i = 0; i < items[category].length; i++) {
+                html += '<div class="item" data-category="' + category + '">' + items[category][i] + "</div>";
+            }
+
+            content.innerHTML = html;
+        });
+
+        // Инициализировать содержимое первым выбранным значением
+        var initialHtml = "";
+        var initialCategory = select.value;
+
+        for (var i = 0; i < items[initialCategory].length; i++) {
+            initialHtml += '<div class="item" data-category="' + initialCategory + '">' + items[initialCategory][i] + "</div>";
+        }
+
+        content.innerHTML = initialHtml;
+
+        // Добавить обработчик события на клик по item, чтобы выбрать только один элемент
+        content.addEventListener("click", function(event) {
+            var selectedItem = event.target;
+
+            if (selectedItem.classList.contains("item")) {
+                var category = selectedItem.dataset.category;
+                var itemsInCategory = this.querySelectorAll(".item[data-category='" + category + "']");
+
+                for (var i = 0; i < itemsInCategory.length; i++) {
+                    if (itemsInCategory[i] !== selectedItem) {
+                        itemsInCategory[i].classList.remove("selected");
+                    }
+                }
+
+                selectedItem.classList.toggle("selected");
+            }
+        });
+
+        var products = {
+            meat: {
+                "Курица": 0.81,
+                "Говядина": 1.28,
+                "Свинина": 1.14,
+                "Баранина": 1.45
+            },
+            fish: {
+                "Треска": 0.89,
+                "Лосось": 1.35,
+                "Скумбрия": 1.31,
+                "Макрель": 1.43
+            },
+            vegetables: {
+                "Морковь": 0.41,
+                "Капуста": 0.25,
+                "Огурцы": 0.15,
+                "Томаты": 0.18
+            },
+            fruits: {
+                "Яблоки": 0.52,
+                "Апельсины": 0.47,
+                "Бананы": 0.89,
+                "Ананасы": 0.5
+            },
+            sweets: {
+                "Шоколад": 5.3,
+                "Конфеты": 3.5,
+                "Печенье": 4.5,
+                "Мармелад": 3.1
+            }
+        };
+
+        var calculateButton = document.querySelector('.button');
+        calculateButton.addEventListener('click', function() {
+            // Получить выбранную категорию и количество грамм из формы
+            var categorySelect = document.getElementById('my-select');
+            var category = categorySelect.value;
+            var amountInput = document.getElementById('amount');
+            var amount = amountInput.value;
+
+            // Найти соответствующее значение калорий на основе выбранной категории и выбранного продукта из объекта products
+            var selectedItem = document.querySelector('.item.selected');
+            var caloriesPerGram = products[category][selectedItem.textContent];
+
+            // Рассчитать количество калорий
+            var totalCalories = amount * caloriesPerGram;
+
+            // Вывести результат в форму <input type="number" id="calories" readonly/>
+            var caloriesInput = document.getElementById('calories');
+            caloriesInput.value = totalCalories;
+        });
+
+        document.getElementById('my-form').addEventListener('submit', function(event) {
+            if (!validateInputs()) {
+                event.preventDefault();
+            }
+        });
+
+        function validateInputs() {
+            const dateValue = document.getElementById("date-input").value;
+            const caloriesValue = document.getElementById('calories').value;
+
+            if (!dateValue || caloriesValue === "0" || !caloriesValue) {
+                if (!dateValue) {
+                    alert("Выберите дату");
+                } else {
+                    alert("Введите кол-во калорий");
+                }
+                return false;
+            }
+
+            return true;
+        }
+
+        // Функция для расчета калорий
+        function calculateCalories() {
+            // Получить выбранную категорию и количество грамм из формы
+            var categorySelect = document.getElementById('my-select');
+            var category = categorySelect.value;
+            var amountInput = document.getElementById('amount');
+            var amount = amountInput.value;
+
+            // Найти соответствующее значение калорий на основе выбранной категории и выбранного продукта из объекта products
+            var selectedItem = document.querySelector('.item.selected');
+            var caloriesPerGram = products[category][selectedItem.textContent];
+
+            // Рассчитать количество калорий
+            var totalCalories = amount * caloriesPerGram;
+
+            // Вывести результат в форму <input type="number" id="calories" readonly/>
+            var caloriesInput = document.getElementById('calories');
+            caloriesInput.value = totalCalories.toFixed(0);
+        }
+
+        // Добавить обработчик события на кнопку "Рассчитать калории"
+        var calculateButton = document.querySelector('.button');
+        calculateButton.addEventListener('click', calculateCalories);
+    </script>
+</body>
