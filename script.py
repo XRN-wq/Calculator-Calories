@@ -18,6 +18,9 @@ class Calories(Base):
     __tablename__ = "Calories"
     id = Column(Integer, primary_key=True)
     amount = Column(Integer)
+    category = Column(String)
+    item = Column(String)
+    gramms = Column(String)
     date_id = Column(Integer)
 
 
@@ -43,7 +46,17 @@ def index():
         session = db_connection()
         date_time = request.form["date"]
         calories = request.form["calories"]
-
+        category = request.form["category"]
+        item = request.form["item"]
+        gramms = request.form["amount"]
+        if gramms == "":
+            gramms = "-"
+        else:
+            gramms = str(gramms)
+        if category is None:
+            category = "-"
+        if item is None:
+            item = "-"
         existing_date = session.query(Dates).filter_by(date_time=date_time).first()
         if existing_date is None:
             new_date = Dates(date_time=date_time)
@@ -53,7 +66,9 @@ def index():
         else:
             pass
 
-        new_calories = Calories(date_id=existing_date.id, amount=calories)
+        new_calories = Calories(
+            date_id=existing_date.id, amount=calories, category=category, item=item, gramms=gramms
+        )
         session.add(new_calories)
         session.commit()
 
@@ -65,15 +80,16 @@ def statistics():
     session = db_connection()
     calories = session.query(Calories).all()
     dates = session.query(Dates).all()
-    total_calories = sum([calorie.amount for calorie in calories])
-    average_calories = total_calories / len(calories) if len(calories) > 0 else 0
-    average_calories = round(average_calories, 2)
     dates_not_empty = []
+
     for date in dates:
         for calorie in calories:
             if calorie.date_id == date.id:
                 dates_not_empty.append(date)
     dates_not_empty = list(set(dates_not_empty))
+    total_calories = sum([calorie.amount for calorie in calories])
+    average_calories = total_calories / len(dates_not_empty) if len(dates_not_empty) > 0 else 0
+    average_calories = round(average_calories)
     if request.method == "POST":
         delete_id = request.form["delete"]
         calorie = session.query(Calories).filter_by(id=delete_id).first()
@@ -86,19 +102,19 @@ def statistics():
             dates_not_empty = []
             for date in dates:
                 for calorie in calories:
+
                     if calorie.date_id == date.id:
                         dates_not_empty.append(date)
             dates_not_empty = list(set(dates_not_empty))
             total_calories = sum([c.amount for c in calories])
-            average_calories = (
-                total_calories / len(calories) if len(calories) > 0 else 0
-            )
-            average_calories = round(average_calories, 2)
+            average_calories = total_calories / len(dates_not_empty) if len(dates_not_empty) > 0 else 0
+            average_calories = round(average_calories)
+    dates_not_empty.sort(key=lambda x: x.date_time, reverse=True)
     return render_template(
         "statistics.html",
         dates=dates_not_empty,
         calories=calories,
-        average_calories=average_calories,
+        average_calories=average_calories
     )
 
 

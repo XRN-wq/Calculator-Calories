@@ -1,22 +1,20 @@
 body {
     font-family: Arial, sans-serif;
-    padding: 20px;
+    padding: 10px;
     background-color: #f0f0f0;
 }
 
 h1 {
-    margin-bottom: 20px;
+    margin-bottom: 10px;
 }
 
 table {
     width: 100%;
     border-collapse: collapse;
-    margin-bottom: 20px;
 }
 
 th,
 td {
-    padding: 10px;
     text-align: left;
     border-bottom: 1px solid #ddd;
 }
@@ -25,24 +23,36 @@ th {
     background-color: #f9f9f9;
 }
 
-ol {
-    margin: 0;
-    padding: 0;
+ul {
     list-style-type: none;
+    margin: 10px;
+    padding: 10px;
 }
 
 li {
-    margin-bottom: 10px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+li:before {
+    content: "\00a0";
+    margin-right: 0;
 }
 
 button {
     background-color: #f44336;
     color: #fff;
-    padding: 5px 10px;
     border: none;
     cursor: pointer;
+    justify-content: center;
+    align-items: center;
+    font-size: 10px;
+    height: 15px;
 }
-
+.amount {
+    display: inline-block;
+    margin-left: 10px;
+}
 button:hover {
     background-color: #d32f2f;
 }
@@ -65,15 +75,6 @@ tfoot th {
 
 .return-button:hover {
     background-color: #0062cc;
-}
-
-.calorie-item {
-    display: flex;
-    align-items: center;
-}
-
-.calorie-amount {
-    margin-right: 10px;
 }
 
 .delete-input {

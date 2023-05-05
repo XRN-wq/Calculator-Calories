@@ -15,29 +15,60 @@
         <thead>
             <tr>
                 <th>Дата</th>
+                <th>Категория продукта</th>
+                <th>Продукт</th>
+                <th>Количество грамм</th>
                 <th>Количество калорий</th>
             </tr>
         </thead>
         <tbody>
+            <tbody>
             {% for date in dates %}
             <tr>
                 <td>{{ date['date_time'] }}</td>
                 <td>
-                    <ol>
-                        {% for calorie in calories %}
+                    <ul>
+                    {% for calorie in calories %}
                         {% if calorie.date_id == date.id  %}
-                        <li>
-                            <div class="calorie-item">
-                                <span class="calorie-amount">{{ calorie.amount }}</span>
-                                <form method="POST">
-                                    <button class="delete-button">Удалить</button>
-                                    <input type="number" class="delete-input" name="delete" value={{ calorie.id }}>
-                                </form>
-                            </div>
-                        </li>
+                            <li>{{ calorie.category }}</li>
                         {% endif %}
-                        {% endfor %}
-                    </ol>
+                    {% endfor %}
+                    </ul>
+                </td>
+                <td>
+                    <ul>
+                    {% for calorie in calories %}
+                        {% if calorie.date_id == date.id  %}
+                            <li>{{ calorie.item }}</li>
+                        {% endif %}
+                    {% endfor %}
+                    </ul>
+                </td>
+                <td>
+                    <ul>
+                    {% for calorie in calories %}
+                        {% if calorie.date_id == date.id  %}
+                            <li>{{ calorie.gramms }}</li>
+                        {% endif %}
+                    {% endfor %}
+                    </ul>
+                </td>
+                <td>
+                    <ul>
+                    {% for calorie in calories %}
+                        {% if calorie.date_id == date.id  %}
+                            <li>
+                                {{ calorie.amount }}
+                                <span class="amount">
+                                    <form method="POST">
+                                        <button class="delete-button">Удалить</button>
+                                        <input type="number" class="delete-input" name="delete" value={{ calorie.id }}>
+                                    </form>
+                                </span>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    </ul>
                 </td>
             </tr>
             {% endfor %}
@@ -45,7 +76,7 @@
         <tfoot>
             <tr>
                 <th>Среднее количество калорий за день:</th>
-                <td colspan="2">{{ average_calories }}</td>
+                <td colspan="4">{{ average_calories }}</td>
             </tr>
         </tfoot>
     </table>

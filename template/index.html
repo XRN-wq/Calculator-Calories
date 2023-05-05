@@ -15,205 +15,404 @@
         <label>Счетчик калорий</label>
     </div>
     <br>
-    <div class="container">
-        <div class="input-container">
-            <label for="my-select">Выберите категорию:</label>
-            <select id="my-select">
-                <option value="meat">Мясо</option>
-                <option value="fish">Рыба</option>
-                <option value="vegetables">Овощи</option>
-                <option value="fruits">Фрукты</option>
-                <option value="sweets">Сладости</option>
-            </select>
-        </div>
+    <form method="POST" id="my-form" onsubmit="validateInputs()">
+        <div class="container">
+            <div class="input-container">
+                <label for="my-select">Категория:</label>
+                <select id="my-select">
+                    <option value="meat">Мясо</option>
+                    <option value="fish">Рыба</option>
+                    <option value="vegetables">Овощи</option>
+                    <option value="fruits">Фрукты</option>
+                    <option value="sweets">Сладости</option>
+                    <option value="dairy">Молочные продукты</option>
+                    <option value="grains">Крупы</option>
+                    <option value="beverages">Напитки</option>
+                    <option value="spices">Специи</option>
+                    <option value="canned">Консервы</option>
+                    <option value="snacks">Снэки</option>
+                    <option value="frozen">Заморозка</option>
+                </select>
+            </div>
 
-        <div class="input-container">
-            <label for="food-type">Тип продукта:</label>
-            <div id="content"></div>
-        </div>
-        <div class="input-container">
-            <label for="amount">Количество (грамм):</label>
-            <input type="number" id="amount" />
-        </div>
+            <div class="input-container">
+                <label for="food-type">Продукт:</label>
+                <div>
+                    <select id="content" multiple></select>
+                </div>
+            </div>
+            <div class="input-container">
+                <label for="amount">Граммы:</label>
+                <input type="number" id="amount" name="amount"/>
+            </div>
 
-        <button class="button" onclick="calculateCalories()">Рассчитать калории</button>
-        <br>
-        <form method="POST" id="my-form">
-            <div class="result-container">
-                <input type="number" id="calories" placeholder="0" name="calories" />
-                <h5>калорий</h5>
+            <button type="button" class="button" onclick="calculateCalories()">Рассчитать калории</button>
+            <br>
+                <div class="result-container">
+                    <input type="number" id="calories" placeholder="0" name="calories" />
+                    <h5>кол-во калорий</h5>
+                    <br>
+                    <p> *если вдруг знаете заранее кол-во калорий - впишите самостоятельно :)</p>
+                </div>
                 <br>
-                <h5>(если знаете кол-во введите самостоятельно)</h5>
-            </div>
-            <br>
-            <div class="date-input">
-                <label for="date-input">Выберите дату:</label>
-                <input type="date" id="date-input" name="date">
-            </div>
-            <br>
-            <div class="submit-container">
-                <input type="submit" id="submit" value="Отправить">
-            </div>
-        </form>
-    </div>
+                <div class="date-input">
+                    <label for="date-input">Выберите дату:</label>
+                    <input type="date" id="date-input" name="date">
+                </div>
+                <br>
+                <div class="submit-container">
+                    <button type="submit" id="submit">Отправить</button>
+                </div>
+            <input type="text" id="category-input" name="category" value="-" />
+            <input type="text" id="item-input" name="item" value="-" />
+        </div>
+    </form>
     <script>
-        // Получаем текущую дату
         const today = new Date();
 
-        // Преобразуем дату в строку в формате yyyy-mm-dd, который поддерживается элементом <input type="date">
         const yyyy = today.getFullYear();
         const mm = String(today.getMonth() + 1).padStart(2, '0');
         const dd = String(today.getDate()).padStart(2, '0');
         const todayString = `${yyyy}-${mm}-${dd}`;
         const dateInput = document.getElementById('date-input');
         dateInput.value = todayString;
+
         var select = document.getElementById("my-select");
-        var content = document.getElementById("content");
+        const content = document.getElementById("content");
+
         var items = {
-            meat: ["Курица", "Говядина", "Свинина", "Баранина"],
-            fish: ["Треска", "Лосось", "Скумбрия", "Макрель"],
-            vegetables: ["Морковь", "Капуста", "Огурцы", "Томаты"],
-            fruits: ["Яблоки", "Апельсины", "Бананы", "Ананасы"],
-            sweets: ["Шоколад", "Конфеты", "Печенье", "Мармелад"]
+            meat: ["Курица", "Говядина", "Свинина", "Баранина", "Кролик", "Конина", "Индейка", "Утка", "Гусь", "Бекон", "Ветчина", "Колбаса", "Сосиски", "Буженина", "Телятина"],
+            fish: ["Треска", "Лосось", "Скумбрия", "Макрель", "Сардина", "Сёмга", "Камбала", "Карась", "Осётр", "Форель", "Угорь", "Сельдь", "Горбуша", "Щука", "Карп", "Лещ"],
+            vegetables: ["Морковь", "Капуста", "Огурцы", "Томаты", "Салат", "Перец", "Редис", "Баклажаны", "Кабачки", "Лук", "Чеснок", "Картофель", "Спаржа", "Репа", "Тыква", "Горох"],
+            fruits: ["Яблоки", "Апельсины", "Бананы", "Ананасы", "Абрикосы", "Арбузы", "Груши", "Виноград", "Персики", "Черешня", "Сливы", "Лимоны", "Мандарины", "Гранаты", "Манго", "Киви"],
+            sweets: ["Шоколад", "Конфеты", "Печенье", "Мармелад", "Марципан", "Халва", "Пряники", "Вафли", "Зефир", "Леденцы", "Шоколадные батончики", "Карамель", "Торт", "Пирожное", "Маффины", "Макаруны"],
+            dairy: ["Молоко", "Сыр", "Творог", "Сметана", "Йогурт", "Кефир", "Сливки", "Ряженка", "Масло", "Сгущенка", "Молочный коктейль", "Брынза", "Сухое молоко", "Моцарелла", "Козий сыр", "Пармезан"],
+            grains: ["Рис", "Гречка", "Овсянка", "Пшено", "Паста", "Панировочные сухари", "Хлеб", "Булочки", "Круассаны", "Хлопья", "Манная крупа", "Перловая крупа", "Ячневая крупа", "Гречневая лапша", "Киноа", "Пшеница"],
+            beverages: ["Чай", "Кофе", "Сок", "Компот", "Молочный коктейль", "Квас", "Лимонад", "Газировка", "Энергетик", "Айран", "Кокосовый сок", "Какао", "Вино", "Пиво"],
+            spices: ["Соль", "Перец", "Кориандр", "Куркума", "Паприка", "Чеснок", "Кинза", "Кардамон", "Корица", "Имбирь", "Гвоздика", "Мускатный орех", "Розмарин", "Тмин", "Орегано", "Базилик"],
+            canned: ["Консервы из мяса", "Консервы из рыбы", "Консервы овощные", "Фруктовые консервы", "Горчица", "Кетчуп", "Майонез", "Томатный соус", "Соус для салата", "Маринованные огурцы", "Маринованные грибы", "Анчоусы", "Сардельки", "Кукуруза консервированная", "Горошек консервированный"],
+            snacks: ["Чипсы", "Орехи", "Сухарики", "Крекеры", "Попкорн", "Семечки", "Снэки", "Шашлычки", "Печенье", "Сладкий попкорн", "Пикантные батончики", "Сушеные фрукты", "Сушеные овощи", "Фруктовый батончик", "Сладкий пирог"],
+            frozen: ["Мороженое", "Овощной микс", "Фруктовый микс", "Морепродукты", "Пельмени", "Вареники", "Картофель фри", "Пицца", "Блины"],
         };
 
-        // Добавить обработчик события на изменение select
         select.addEventListener("change", function() {
             var html = "";
             var category = this.value;
 
             for (var i = 0; i < items[category].length; i++) {
-                html += '<div class="item" data-category="' + category + '">' + items[category][i] + "</div>";
+                html += '<option id="item" title="' + items[category][i] + '" value="' + category + '">' + items[category][i] + '</option>'
             }
 
             content.innerHTML = html;
         });
 
-        // Инициализировать содержимое первым выбранным значением
         var initialHtml = "";
         var initialCategory = select.value;
 
         for (var i = 0; i < items[initialCategory].length; i++) {
-            initialHtml += '<div class="item" data-category="' + initialCategory + '">' + items[initialCategory][i] + "</div>";
+            initialHtml += '<option id="item" title="' + items[initialCategory][i] + '" value="' + initialCategory + '">' + items[initialCategory][i] + '</option>'
+
         }
 
         content.innerHTML = initialHtml;
 
-        // Добавить обработчик события на клик по item, чтобы выбрать только один элемент
-        content.addEventListener("click", function(event) {
-            var selectedItem = event.target;
-
-            if (selectedItem.classList.contains("item")) {
-                var category = selectedItem.dataset.category;
-                var itemsInCategory = this.querySelectorAll(".item[data-category='" + category + "']");
-
-                for (var i = 0; i < itemsInCategory.length; i++) {
-                    if (itemsInCategory[i] !== selectedItem) {
-                        itemsInCategory[i].classList.remove("selected");
-                    }
-                }
-
-                selectedItem.classList.toggle("selected");
-            }
-        });
-
         var products = {
             meat: {
-                "Курица": 0.81,
-                "Говядина": 1.28,
-                "Свинина": 1.14,
-                "Баранина": 1.45
+            "Курица": 1.5,
+            "Говядина": 2.4,
+            "Свинина": 2.8,
+            "Баранина": 2.4,
+            "Кролик": 1.4,
+            "Конина": 2.1,
+            "Индейка": 1.3,
+            "Утка": 3.1,
+            "Гусь": 3.0,
+            "Бекон": 5.5,
+            "Ветчина": 3.5,
+            "Колбаса": 3.0,
+            "Сосиски": 2.8,
+            "Буженина": 4.0,
+            "Телятина": 1.8
             },
+
             fish: {
-                "Треска": 0.89,
-                "Лосось": 1.35,
-                "Скумбрия": 1.31,
-                "Макрель": 1.43
+            "Треска": 0.8,
+            "Лосось": 2.3,
+            "Скумбрия": 1.8,
+            "Макрель": 2.0,
+            "Сардина": 1.9,
+            "Сёмга": 2.3,
+            "Камбала": 1.0,
+            "Карась": 0.9,
+            "Осётр": 2.6,
+            "Форель": 1.6,
+            "Угорь": 2.6,
+            "Сельдь": 1.9,
+            "Горбуша": 2.0,
+            "Щука": 0.9,
+            "Карп": 1.3,
+            "Лещ": 0.8
             },
+
             vegetables: {
-                "Морковь": 0.41,
-                "Капуста": 0.25,
-                "Огурцы": 0.15,
-                "Томаты": 0.18
+            "Морковь": 0.4,
+            "Капуста": 0.2,
+            "Огурцы": 0.1,
+            "Томаты": 0.2,
+            "Салат": 0.2,
+            "Перец": 0.2,
+            "Редис": 0.2,
+            "Баклажаны": 0.3,
+            "Кабачки": 0.1,
+            "Лук": 0.1,
+            "Чеснок": 0.1,
+            "Картофель": 0.8,
+            "Спаржа": 0.2,
+            "Репа": 0.2,
+            "Тыква": 0.2,
+            "Горох": 1.2
             },
+
             fruits: {
-                "Яблоки": 0.52,
-                "Апельсины": 0.47,
-                "Бананы": 0.89,
-                "Ананасы": 0.5
+            "Яблоки": 0.52,
+            "Апельсины": 0.47,
+            "Бананы": 0.89,
+            "Ананасы": 0.5,
+            "Абрикосы": 0.44,
+            "Арбузы": 0.3,
+            "Груши": 0.57,
+            "Виноград": 0.69,
+            "Персики": 0.39,
+            "Черешня": 0.5,
+            "Сливы": 0.46,
+            "Лимоны": 0.29,
+            "Мандарины": 0.38,
+            "Гранаты": 0.71,
+            "Манго": 0.6,
+            "Киви": 0.61
             },
+
+            grains: {
+            "Рис": 1.3,
+            "Гречка": 1.2,
+            "Овсянка": 1.6,
+            "Пшено": 1.3,
+            "Паста": 1.4,
+            "Панировочные сухари": 4.5,
+            "Хлеб": 2.4,
+            "Булочки": 3.0,
+            "Круассаны": 4.0,
+            "Хлопья": 3.0,
+            "Манная крупа": 1.5,
+            "Перловая крупа": 1.4,
+            "Ячневая крупа": 1.4,
+            "Гречневая лапша": 3.0,
+            "Киноа": 1.4,
+            "Пшеница": 1.3
+            },
+
             sweets: {
-                "Шоколад": 5.3,
-                "Конфеты": 3.5,
-                "Печенье": 4.5,
-                "Мармелад": 3.1
+            "Шоколад": 5.5,
+            "Конфеты": 4.5,
+            "Печенье": 4.0,
+            "Мармелад": 3.0,
+            "Марципан": 5.0,
+            "Халва": 5.0,
+            "Пряники": 3.5,
+            "Вафли": 5.0,
+            "Зефир": 3.5,
+            "Леденцы": 3.0,
+            "Шоколадные батончики": 4.5,
+            "Карамель": 4.0,
+            "Торт": 4.0,
+            "Пирожное": 4.5,
+            "Маффины": 4.0,
+            "Макаруны": 3.5
+            },
+
+            beverages: {
+            "Чай": 0.2,
+            "Кофе": 0.2,
+            "Сок": 0.4,
+            "Компот": 0.3,
+            "Молочный коктейль": 0.6,
+            "Квас": 0.4,
+            "Лимонад": 0.3,
+            "Газировка": 0.3,
+            "Энергетик": 0.4,
+            "Айран": 0.3,
+            "Кокосовый сок": 0.5,
+            "Какао": 0.5,
+            "Вино": 0.7,
+            "Пиво": 0.4
+            },
+
+            spices: {
+            "Соль": 0,
+            "Перец": 0.26,
+            "Кориандр": 0.298,
+            "Куркума": 0.312,
+            "Паприка": 0.252,
+            "Чеснок": 1.5,
+            "Кинза": 0.279,
+            "Кардамон": 0.311,
+            "Корица": 0.247,
+            "Имбирь": 0.8,
+            "Гвоздика": 0.266,
+            "Мускатный орех": 0.34,
+            "Розмарин": 0.142,
+            "Тмин": 0.324,
+            "Орегано": 0.264,
+            "Базилик": 0.233
+            },
+
+            canned: {
+            "Консервы из мяса": 1.88,
+            "Консервы из рыбы": 0.9,
+            "Консервы овощные": 0.74,
+            "Фруктовые консервы": 0.83,
+            "Горчица": 0.6,
+            "Кетчуп": 0.1,
+            "Майонез": 0.68,
+            "Томатный соус": 0.53,
+            "Соус для салата": 0.45,
+            "Маринованные огурцы": 0.14,
+            "Маринованные грибы": 0.33,
+            "Анчоусы": 2.88,
+            "Сардельки": 2.57,
+            "Кукуруза консервированная": 0.58,
+            "Горошек консервированный": 0.81
+            },
+
+            frozen: {
+            "Мороженое": 2.4,
+            "Овощной микс": 0.43,
+            "Фруктовый микс": 0.57,
+            "Морепродукты": 0.97,
+            "Пельмени": 1.6,
+            "Вареники": 1.68,
+            "Картофель фри": 0.95,
+            "Пицца": 2.27,
+            "Пирожки": 2.23,
+            "Блины": 1.6
+            },
+            snacks: {
+            "Чипсы": 5.5,
+            "Орехи": 6.5,
+            "Сухарики": 4.0,
+            "Крекеры": 4.5,
+            "Попкорн": 5.0,
+            "Семечки": 5.5,
+            "Снэки": 4.5,
+            "Шашлычки": 2.5,
+            "Печенье": 4.0,
+            "Сладкий попкорн": 7.0,
+            "Пикантные батончики": 6.0,
+            "Сушеные фрукты": 3.5,
+            "Сушеные овощи": 3.0,
+            "Фруктовый батончик": 3.5,
+            "Сладкий пирог": 4.5
+            },
+
+            dairy: {
+            "Молоко": 1.0,
+            "Сыр": 4.0,
+            "Творог": 1.5,
+            "Сметана": 2.5,
+            "Йогурт": 1.5,
+            "Кефир": 1.0,
+            "Сливки": 3.5,
+            "Ряженка": 1.0,
+            "Масло": 7.0,
+            "Сгущенка": 3.5,
+            "Молочный коктейль": 1.5,
+            "Брынза": 2.0,
+            "Сухое молоко": 4.5,
+            "Моцарелла": 3.5,
+            "Козий сыр": 3.5,
+            "Пармезан": 4.0
             }
         };
+        const searchBox = document.createElement('input');
+        const searchContent = document.getElementById("content")
+        searchBox.setAttribute('type', 'text');
+        searchBox.setAttribute('placeholder', 'Поиск');
+        searchBox.setAttribute('id', 'searchBox');
+        searchBox.addEventListener("focus", () => {
+          searchBox.value = "";
+        });
+        searchContent.parentNode.insertBefore(searchBox, searchContent);
 
-        var calculateButton = document.querySelector('.button');
-        calculateButton.addEventListener('click', function() {
-            // Получить выбранную категорию и количество грамм из формы
-            var categorySelect = document.getElementById('my-select');
-            var category = categorySelect.value;
-            var amountInput = document.getElementById('amount');
-            var amount = amountInput.value;
 
-            // Найти соответствующее значение калорий на основе выбранной категории и выбранного продукта из объекта products
-            var selectedItem = document.querySelector('.item.selected');
-            var caloriesPerGram = products[category][selectedItem.textContent];
 
-            // Рассчитать количество калорий
-            var totalCalories = amount * caloriesPerGram;
+        var selectedItem = ""
+        content.addEventListener("click", (event) => {
+          selectedItem = event.target;
+          if (selectedItem.tagName === "OPTION") {
+            selectedItem.selected = true;
+            searchBox.value = selectedItem.text;
+            select.value = selectedItem.value;
+          }
+        });
+        searchBox.addEventListener("input", function() {
+          var input = searchBox.value.toLowerCase();
+          content.innerHTML = "";
 
-            // Вывести результат в форму <input type="number" id="calories" readonly/>
-            var caloriesInput = document.getElementById('calories');
-            caloriesInput.value = totalCalories;
+          for (var key in items) {
+            if (items.hasOwnProperty(key)) {
+              for (var i = 0; i < items[key].length; i++) {
+                if (items[key][i].toLowerCase().indexOf(input) !== -1) {
+                  var category = key.toLowerCase();
+                  var option = document.createElement("option");
+                  option.text = items[key][i];
+                  option.setAttribute("value", category);
+                  option.setAttribute("title", items[key][i])
+                  content.add(option);
+                }
+              }
+            }
+          }
         });
 
+
+
+        function validateInputs() {
+          const dateValue = document.getElementById("date-input").value;
+          const caloriesValue = document.getElementById('calories').value;
+          var fl = true;
+          if (!dateValue || !caloriesValue || caloriesValue === "0") {
+              fl = false;
+              alert("Введите кол-во калорий или дату")
+              event.preventDefault();
+          }
+          else {
+
+          }
+          return fl;
+        }
         document.getElementById('my-form').addEventListener('submit', function(event) {
             if (!validateInputs()) {
                 event.preventDefault();
             }
         });
-
-        function validateInputs() {
-            const dateValue = document.getElementById("date-input").value;
-            const caloriesValue = document.getElementById('calories').value;
-
-            if (!dateValue || caloriesValue === "0" || !caloriesValue) {
-                if (!dateValue) {
-                    alert("Выберите дату");
-                } else {
-                    alert("Введите кол-во калорий");
-                }
-                return false;
-            }
-
-            return true;
-        }
-
-        // Функция для расчета калорий
         function calculateCalories() {
-            // Получить выбранную категорию и количество грамм из формы
+            const category_input = document.getElementById("category-input")
+            const item_input = document.getElementById("item-input")
             var categorySelect = document.getElementById('my-select');
             var category = categorySelect.value;
             var amountInput = document.getElementById('amount');
+            const selectElement = document.getElementById("content");
             var amount = amountInput.value;
-
-            // Найти соответствующее значение калорий на основе выбранной категории и выбранного продукта из объекта products
-            var selectedItem = document.querySelector('.item.selected');
+            var selectedItem = selectElement.options[selectElement.selectedIndex];
             var caloriesPerGram = products[category][selectedItem.textContent];
 
-            // Рассчитать количество калорий
             var totalCalories = amount * caloriesPerGram;
 
-            // Вывести результат в форму <input type="number" id="calories" readonly/>
             var caloriesInput = document.getElementById('calories');
             caloriesInput.value = totalCalories.toFixed(0);
+            var category_inp = categorySelect.options[categorySelect.selectedIndex];
+            item_input.value = selectedItem.textContent;
+            category_input.value = category_inp.textContent;
         }
-
-        // Добавить обработчик события на кнопку "Рассчитать калории"
-        var calculateButton = document.querySelector('.button');
-        calculateButton.addEventListener('click', calculateCalories);
     </script>
 </body>
